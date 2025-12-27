@@ -1,0 +1,648 @@
+import React, { useState } from 'react';
+import { 
+  BookOpen, 
+  Calculator, 
+  Atom, 
+  Beaker, 
+  Scale, 
+  Activity, 
+  ArrowRight, 
+  Lightbulb, 
+  CheckCircle, 
+  HelpCircle,
+  Eye,
+  EyeOff,
+  Heart
+} from 'lucide-react';
+
+const ChemistrySolverApp = () => {
+  const [activeTab, setActiveTab] = useState('examples');
+  const [expandedTopic, setExpandedTopic] = useState('all');
+  
+  // State for the "Try It Yourself" section to track revealed answers
+  const [revealedAnswers, setRevealedAnswers] = useState({});
+
+  const toggleReveal = (id) => {
+    setRevealedAnswers(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  // Topics for Examples
+  const topics = [
+    { id: 'quantum', title: 'كيمياء الكم والضوء', icon: <Activity className="w-5 h-5" /> },
+    { id: 'moles', title: 'المولات والوزن الجزيئي', icon: <Scale className="w-5 h-5" /> },
+    { id: 'conc', title: 'التركيز والتحضير', icon: <Beaker className="w-5 h-5" /> },
+    { id: 'volumetric', title: 'التحليل الحجمي', icon: <Calculator className="w-5 h-5" /> },
+    { id: 'equilibrium', title: 'الاتزان والـ pH', icon: <ArrowRight className="w-5 h-5" /> },
+  ];
+
+  // Questions Data
+  const questions = [
+    // Quantum
+    {
+      id: 71,
+      topic: 'quantum',
+      title: 'سؤال 71 (نموذج A)',
+      question: 'ضوء أزرق طول موجته 434 nm، فإن تردد الموجة يساوي...',
+      solution: [
+        'المعطيات: الطول الموجي (λ) = 434 × 10⁻⁹ m، سرعة الضوء (c) = 3 × 10⁸ m/s',
+        'القانون: ν = c / λ',
+        'التعويض: ν = (3 × 10⁸) / (434 × 10⁻⁹)',
+        'الناتج: 6.9 × 10¹⁴ Hz'
+      ],
+      answer: '(B) 6.9 × 10¹⁴'
+    },
+    {
+      id: 74,
+      topic: 'quantum',
+      title: 'سؤال 74 (نموذج A)',
+      question: 'التردد للفوتون المنبعث لإلكترون ذرة الهيدروجين من الحالة n=2 إلى الحالة n=1 يساوي...',
+      solution: [
+        'القانون: معادلة ريدبيرج ν = R_H (1/n₁² - 1/n₂²)',
+        'حيث R_H ≈ 3.29 × 10¹⁵ Hz',
+        'التعويض: ν = 3.29 × 10¹⁵ (1/1² - 1/2²) = 3.29 × 10¹⁵ (0.75)',
+        'الناتج: 2.47 × 10¹⁵ Hz'
+      ],
+      answer: '(A) 2.47 × 10¹⁵'
+    },
+    {
+      id: 85,
+      topic: 'quantum',
+      title: 'سؤال 85 (نموذج 3)',
+      question: 'تردد إشعاع طول موجته 600 سم علماً بأن سرعة الضوء 3 × 10¹⁰ سم/ث هو:',
+      solution: [
+        'القانون: ν = c / λ',
+        'التعويض: ν = (3 × 10¹⁰) / 600',
+        'الناتج: 5 × 10⁷ Hz'
+      ],
+      answer: '(B) 5 × 10⁷ هرتز'
+    },
+    // Moles
+    {
+      id: 81,
+      topic: 'moles',
+      title: 'سؤال 81 (نموذج A)',
+      question: 'عدد الجزيئات الموجودة في 25 جرام H هي:',
+      solution: [
+        'اعتبار الغاز H₂ (وزن جزيئي 2)',
+        'عدد المولات = الوزن / الوزن الجزيئي = 25 / 2 = 12.5 مول',
+        'عدد الجزيئات = عدد المولات × عدد أفوجادرو',
+        'الناتج: 12.5 × 6.02 × 10²³ = 75.25 × 10²³'
+      ],
+      answer: '(C) 75.25 × 10²³'
+    },
+    {
+      id: 82,
+      topic: 'moles',
+      title: 'سؤال 82 (نموذج A)',
+      question: 'عدد الأوزان الفورمالية الموجودة في 27.3 جرام من MnO₄ وزنه الفورمالي 119:',
+      solution: [
+        'عدد الأوزان الفورمالية (المولات) = الوزن بالجرام / الوزن الفورمالي',
+        'التعويض: 27.3 / 119 ≈ 0.229',
+        'التقريب لأقرب رقم صحيح في الخيارات'
+      ],
+      answer: '(A) 0.2'
+    },
+    {
+      id: 83,
+      topic: 'moles',
+      title: 'سؤال 83 (نموذج A)',
+      question: 'عدد المولات الموجودة في 90 جرام من H₂O:',
+      solution: [
+        'الوزن الجزيئي للماء = 18',
+        'عدد المولات = 90 / 18 = 5'
+      ],
+      answer: '(D) 5'
+    },
+    // Concentration
+    {
+      id: '85_conc',
+      topic: 'conc',
+      title: 'سؤال 85 (نموذج A)',
+      question: 'الوزن المذاب اللازم لتحضير لتر من MgCl₂ (وزنه 95) بتركيز 0.01 مولر:',
+      solution: [
+        'الوزن = المولارية × الحجم (لتر) × الوزن الجزيئي',
+        'التعويض: 0.01 × 1 × 95 = 0.95 جم'
+      ],
+      answer: '(B) 0.95 جرام'
+    },
+    {
+      id: 88,
+      topic: 'conc',
+      title: 'سؤال 88 (نموذج A)',
+      question: 'التركيز الفورمالي لمحلول 27% (وزنية) من النشادر NH₃ (وزن 17) وكثافته 0.9:',
+      solution: [
+        'القانون: M = (% × d × 1000) / MW',
+        'التعويض: (0.27 × 0.9 × 1000) / 17',
+        'الناتج: 243 / 17 ≈ 14.29'
+      ],
+      answer: '(B) 14.29'
+    },
+    {
+      id: 89,
+      topic: 'conc',
+      title: 'سؤال 89 (نموذج A)',
+      question: 'لتحضير 20 لتر من محلول Na₂SO₄ بتركيز 0.10 مولر من محلول لنفس الملح بتركيز 2.4 مولر يلزم:',
+      solution: [
+        'قانون التخفيف: C₁V₁ = C₂V₂',
+        'التعويض: 2.4 × V₁ = 0.10 × 20',
+        'V₁ = 2 / 2.4 = 0.833 لتر'
+      ],
+      answer: '(C) 0.83 لتر'
+    },
+    {
+      id: 91,
+      topic: 'conc',
+      title: 'سؤال 91 (نموذج A)',
+      question: 'الوزن المذاب بالجرام اللازم لتحضير 200 مل من محلول جلوكوز 10% (وزنية-حجمية):',
+      solution: [
+        'القانون: % (w/v) = (الوزن / الحجم) × 100',
+        'التعويض: 10 = (W / 200) × 100',
+        'W = (10 × 200) / 100 = 20 جم'
+      ],
+      answer: '(B) 20'
+    },
+    // Volumetric
+    {
+      id: 84,
+      topic: 'volumetric',
+      title: 'سؤال 84 (نموذج A)',
+      question: 'عدد المكافئات الموجودة في 36.5 جرام من HCl:',
+      solution: [
+        'الوزن المكافئ لـ HCl = 36.5 / 1 = 36.5',
+        'عدد المكافئات = الوزن / الوزن المكافئ = 36.5 / 36.5 = 1'
+      ],
+      answer: '(A) 1'
+    },
+    {
+      id: 96,
+      topic: 'volumetric',
+      title: 'سؤال 96 (نموذج A)',
+      question: 'عدد الملليمكافئات في 20 مل من Ba(OH)₂ 0.1 عياري:',
+      solution: [
+        'القانون: meq = N × V(ml)',
+        'التعويض: 0.1 × 20 = 2'
+      ],
+      answer: '(B) 2'
+    },
+    {
+      id: '94_tit',
+      topic: 'volumetric',
+      title: 'سؤال 94 (معايرة)',
+      question: '30 مل AgNO₃ (0.05 N) تعاير 10 مل كلوريد. التركيز العياري للكلوريد:',
+      solution: [
+        'القانون: N₁V₁ = N₂V₂',
+        'التعويض: 0.05 × 30 = N × 10',
+        '1.5 = 10N → N = 0.15'
+      ],
+      answer: '(A) 0.15 عياري'
+    },
+    // Equilibrium
+    {
+      id: 97,
+      topic: 'equilibrium',
+      title: 'سؤال 97 (نموذج صفحة 8)',
+      question: 'حمض خليك 0.1 مولر، [H₃O⁺] = 1.32 × 10⁻³. احسب Ka:',
+      solution: [
+        'القانون: Ka ≈ [H⁺]² / C',
+        'التعويض: (1.32 × 10⁻³)² / 0.1',
+        'الناتج: 1.74 × 10⁻⁵'
+      ],
+      answer: '(A) 1.74 × 10⁻⁵'
+    },
+    {
+      id: 98,
+      topic: 'equilibrium',
+      title: 'سؤال 98 (حاصل الإذابة)',
+      question: 'حاصل الإذابة Ksp لـ Mg(OH)₂، إذا كان تركيز المغنسيوم 3.7 × 10⁻⁴:',
+      solution: [
+        'معادلة التفكك: Mg(OH)₂ ⇌ Mg²⁺ + 2OH⁻',
+        'إذا كان [Mg] = s، فإن [OH] = 2s',
+        'Ksp = [Mg][OH]² = s(2s)² = 4s³',
+        'التعويض: 4 × (3.7 × 10⁻⁴)³ ≈ 2.02 × 10⁻¹⁰'
+      ],
+      answer: '2.02 × 10⁻¹⁰'
+    }
+  ];
+
+  const filteredQuestions = expandedTopic === 'all' 
+    ? questions 
+    : questions.filter(q => q.topic === expandedTopic);
+
+  // Formulas Data
+  const formulaCategories = [
+    {
+      title: "أساسيات منسية (Basics)",
+      description: "قوانين بديهية لكن مهمة جداً",
+      items: [
+        {
+          eng: "Density (d) = Mass (m) / Volume (V)",
+          ar: "الكثافة = الكتلة / الحجم",
+          note: "وحدات شائعة: g/ml أو g/cm³"
+        },
+        {
+          eng: "1 Liter (L) = 1000 milliliters (ml)",
+          ar: "التحويل من لتر إلى ملليلتر",
+          note: "للتحويل من مل إلى لتر نقسم على 1000"
+        },
+        {
+          eng: "1 kg = 1000 g, 1 g = 1000 mg",
+          ar: "تحويلات الوزن",
+          note: "للتحويل من ملليجرام إلى جرام نقسم على 1000"
+        },
+        {
+          eng: "Percentage % = (Part / Total) × 100",
+          ar: "النسبة المئوية = (الجزء / الكل) × 100",
+          note: "تستخدم في النسب الوزنية والحجمية"
+        }
+      ]
+    },
+    {
+      title: "قوانين الضوء والكم (Light & Quantum)",
+      description: "حسابات التردد والطول الموجي والطاقة",
+      items: [
+        {
+          eng: "ν = c / λ",
+          ar: "التردد = سرعة الضوء / الطول الموجي",
+          note: "سرعة الضوء c ثابت = 3×10⁸ م/ث"
+        },
+        {
+          eng: "E = h × ν",
+          ar: "طاقة الفوتون = ثابت بلانك × التردد",
+          note: ""
+        },
+        {
+          eng: "ν = R_H (1/n₁² - 1/n₂²)",
+          ar: "معادلة ريدبيرج (لحساب تردد طيف الهيدروجين)",
+          note: "n₁ المستوى الأقل طاقة، n₂ المستوى الأعلى"
+        }
+      ]
+    },
+    {
+      title: "الحساب الكيميائي والمولات (Stoichiometry)",
+      description: "حجر الأساس في الكيمياء التحليلية",
+      items: [
+        {
+          eng: "Moles (n) = Mass (g) / Molecular Weight (MW)",
+          ar: "عدد المولات = الوزن بالجرام / الوزن الجزيئي",
+          note: "أهم قانون في الكيمياء"
+        },
+        {
+          eng: "No. of Molecules = Moles × Avogadro's No.",
+          ar: "عدد الجزيئات = عدد المولات × عدد أفوجادرو",
+          note: "عدد أفوجادرو ≈ 6.02 × 10²³"
+        }
+      ]
+    },
+    {
+      title: "قوانين التركيز (Concentration)",
+      description: "المولارية، العيارية، والتخفيف",
+      items: [
+        {
+          eng: "Molarity (M) = Moles / Volume (L)",
+          ar: "المولارية = عدد المولات / الحجم باللتر",
+          note: "وحدتها: mol/L أو M"
+        },
+        {
+          eng: "Normality (N) = M × z",
+          ar: "العيارية = المولارية × التكافؤ",
+          note: "z هو التكافؤ (عدد H للحمض، OH للقاعدة، أو الإلكترونات للأكسدة)"
+        },
+        {
+          eng: "ppm ≈ mg / L",
+          ar: "جزء في المليون = ملليجرام لكل لتر",
+          note: "تستخدم للمحاليل المخففة جداً"
+        },
+        {
+          eng: "C₁ × V₁ = C₂ × V₂",
+          ar: "قانون التخفيف: تركيز×حجم (قبل) = تركيز×حجم (بعد)",
+          note: "يجب أن تكون وحدات الحجم موحدة في الطرفين"
+        },
+        {
+          eng: "% (w/v) = (Mass of solute (g) / Volume of solution (ml)) × 100",
+          ar: "النسبة الوزنية الحجمية",
+          note: "انتبه: الوزن بالجرام والحجم بالملليلتر"
+        }
+      ]
+    },
+    {
+      title: "الوزن المكافئ (Equivalent Weight)",
+      description: "مهم جداً للمعايرة",
+      items: [
+        {
+          eng: "Eq. Wt = Molecular Weight / z",
+          ar: "الوزن المكافئ = الوزن الجزيئي / التكافؤ",
+          note: "z: للحمض (H⁺)، للقاعدة (OH⁻)، للأملاح (شحنة الكاتيون)"
+        },
+        {
+          eng: "No. of Equivalents = Mass / Eq. Wt",
+          ar: "عدد المكافئات = الوزن / الوزن المكافئ",
+          note: ""
+        }
+      ]
+    },
+    {
+      title: "الاتزان والأس الهيدروجيني (Equilibrium & pH)",
+      description: "حسابات الحموضة والذوبانية",
+      items: [
+        {
+          eng: "pH = -log[H⁺]",
+          ar: "الأس الهيدروجيني = سالب لوغاريتم تركيز الهيدروجين",
+          note: "pH + pOH = 14"
+        },
+        {
+          eng: "Ka = [H⁺]² / C",
+          ar: "ثابت تأين الحمض الضعيف",
+          note: "تستخدم لحساب [H⁺] للأحماض الضعيفة: √(Ka × C)"
+        },
+        {
+          eng: "Ksp = 4s³",
+          ar: "حاصل الإذابة لملح ثلاثي الأيونات (مثل Mg(OH)₂)",
+          note: "s هي الذوبانية المولارية"
+        },
+        {
+          eng: "I = 0.5 ∑ Ci Zi²",
+          ar: "القوة الأيونية = نصف مجموع (التركيز × مربع الشحنة)",
+          note: "Ci التركيز، Zi الشحنة"
+        }
+      ]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans" dir="rtl">
+      {/* Header */}
+      <header className="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col items-start">
+            <div className="flex items-center space-x-2 space-x-reverse">
+              <Atom className="w-8 h-8 text-yellow-400" />
+              <h1 className="text-2xl font-bold">مُراجعة الكيمياء الجامعية</h1>
+            </div>
+            {/* Added Credit and Note */}
+            <div className="mr-10 mt-1 flex flex-col">
+              <span className="text-xs text-blue-200 opacity-90">
+                تم التصميم بواسطة الطالب عبدالرحمن احمد محمد
+              </span>
+              <span className="text-[10px] text-yellow-300 flex items-center gap-1">
+                <Heart className="w-3 h-3" />
+                ان استفدت ادعيلي دعوة حلوة
+              </span>
+            </div>
+          </div>
+          
+          <nav className="flex bg-blue-800 rounded-lg p-1 w-full md:w-auto overflow-x-auto">
+            <button
+              onClick={() => setActiveTab('examples')}
+              className={`flex items-center justify-center flex-1 md:flex-none px-4 py-2 rounded-md transition-all whitespace-nowrap ${
+                activeTab === 'examples' ? 'bg-white text-blue-900 shadow font-bold' : 'text-blue-200 hover:text-white'
+              }`}
+            >
+              <BookOpen className="w-4 h-4 ml-2" />
+              المسائل المحلولة
+            </button>
+            <button
+              onClick={() => setActiveTab('quiz')}
+              className={`flex items-center justify-center flex-1 md:flex-none px-4 py-2 rounded-md transition-all whitespace-nowrap ${
+                activeTab === 'quiz' ? 'bg-white text-blue-900 shadow font-bold' : 'text-blue-200 hover:text-white'
+              }`}
+            >
+              <CheckCircle className="w-4 h-4 ml-2" />
+              جرب بنفسك
+            </button>
+            <button
+              onClick={() => setActiveTab('formulas')}
+              className={`flex items-center justify-center flex-1 md:flex-none px-4 py-2 rounded-md transition-all whitespace-nowrap ${
+                activeTab === 'formulas' ? 'bg-white text-blue-900 shadow font-bold' : 'text-blue-200 hover:text-white'
+              }`}
+            >
+              <Calculator className="w-4 h-4 ml-2" />
+              ملخص القوانين
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8">
+        
+        {/* EXAMPLES SECTION */}
+        {activeTab === 'examples' && (
+          <div className="space-y-6 animate-fadeIn">
+            <div className="bg-blue-50 border-r-4 border-blue-500 p-4 rounded shadow-sm mb-6">
+               <p className="text-blue-800 font-medium">
+                 في هذا القسم، يمكنك استعراض المسائل مع الحلول مباشرة. اختر الموضوع لتصفية الأسئلة.
+               </p>
+            </div>
+
+            {/* Topic Filters */}
+            <div className="flex flex-wrap gap-2 justify-center mb-8">
+              <button
+                onClick={() => setExpandedTopic('all')}
+                className={`px-4 py-2 rounded-full border transition-colors ${
+                  expandedTopic === 'all' 
+                    ? 'bg-blue-600 text-white border-blue-600' 
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                الكل
+              </button>
+              {topics.map(topic => (
+                <button
+                  key={topic.id}
+                  onClick={() => setExpandedTopic(topic.id)}
+                  className={`flex items-center px-4 py-2 rounded-full border transition-colors ${
+                    expandedTopic === topic.id 
+                      ? 'bg-blue-600 text-white border-blue-600' 
+                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="ml-2">{topic.icon}</span>
+                  {topic.title}
+                </button>
+              ))}
+            </div>
+
+            {/* Questions Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredQuestions.map((q) => (
+                <div key={q.id} className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                    <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                      {topics.find(t => t.id === q.topic)?.title}
+                    </span>
+                    <span className="text-xs text-gray-400 font-mono">{q.title}</span>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-gray-800 mb-4 leading-relaxed">
+                      {q.question}
+                    </h3>
+                    
+                    <div className="bg-yellow-50 p-4 rounded-lg border-r-4 border-yellow-400 mb-4">
+                      <h4 className="font-bold text-yellow-800 mb-2 flex items-center">
+                        <Lightbulb className="w-4 h-4 ml-2" />
+                        خطوات الحل:
+                      </h4>
+                      <ul className="list-disc list-inside space-y-2 text-gray-700 text-sm">
+                        {q.solution.map((step, idx) => (
+                          <li key={idx} className="leading-relaxed">{step}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="flex justify-between items-center bg-green-50 px-4 py-3 rounded-lg border border-green-100">
+                      <span className="text-green-800 font-semibold">الإجابة النهائية:</span>
+                      <span className="text-green-900 font-bold font-mono text-lg">{q.answer}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* QUIZ SECTION (Try It Yourself) */}
+        {activeTab === 'quiz' && (
+          <div className="max-w-3xl mx-auto space-y-8 animate-fadeIn">
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">
+              <h2 className="text-xl font-bold text-purple-900 mb-2 flex items-center justify-center">
+                <HelpCircle className="w-6 h-6 ml-2" />
+                اختبر معلوماتك
+              </h2>
+              <p className="text-purple-700">
+                حاول حل المسألة بنفسك في ورقة خارجية، ثم اضغط على الزر لعرض الحل التفصيلي ومقارنة إجابتك.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {questions.map((q, index) => (
+                <div key={q.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6 border-b border-gray-50">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
+                        مسألة رقم {index + 1}
+                      </span>
+                      <span className="text-sm font-semibold text-blue-600">
+                        {topics.find(t => t.id === q.topic)?.title}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 leading-relaxed mb-6">
+                      {q.question}
+                    </h3>
+                    
+                    <button
+                      onClick={() => toggleReveal(q.id)}
+                      className={`w-full py-3 px-4 rounded-lg font-bold flex items-center justify-center transition-all ${
+                        revealedAnswers[q.id] 
+                          ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' 
+                          : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                      }`}
+                    >
+                      {revealedAnswers[q.id] ? (
+                        <>
+                          <EyeOff className="w-5 h-5 ml-2" />
+                          إخفاء الحل
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="w-5 h-5 ml-2" />
+                          عرض الحل والتفسير
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Revealed Content */}
+                  {revealedAnswers[q.id] && (
+                    <div className="bg-blue-50 p-6 border-t-2 border-blue-200 animate-slideDown">
+                      <div className="mb-6">
+                        <h4 className="font-bold text-blue-900 mb-3 flex items-center">
+                          <CheckCircle className="w-5 h-5 ml-2 text-green-600" />
+                          الإجابة الصحيحة:
+                        </h4>
+                        <div className="bg-white p-3 rounded border border-blue-100 font-mono text-lg font-bold text-green-700 text-center shadow-sm">
+                          {q.answer}
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 className="font-bold text-gray-700 mb-3 border-b pb-2">التفسير والخطوات:</h4>
+                        <ul className="space-y-3">
+                          {q.solution.map((step, idx) => (
+                            <li key={idx} className="flex items-start text-gray-700">
+                              <span className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold ml-3 flex-shrink-0 mt-1">
+                                {idx + 1}
+                              </span>
+                              <span className="leading-relaxed">{step}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            <div className="text-center py-8 text-gray-500 text-sm">
+              وصلت لنهاية الأسئلة. أحسنت! 🎉
+            </div>
+          </div>
+        )}
+
+        {/* FORMULAS SECTION */}
+        {activeTab === 'formulas' && (
+          <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+              <h2 className="text-xl font-bold text-blue-900 mb-2">دليل القوانين الشامل</h2>
+              <p className="text-blue-700">
+                تم تجميع القوانين المستخدمة في الامتحانات، بالإضافة إلى القوانين الأساسية التي قد تكون نسيتها من الدراسة السابقة.
+              </p>
+            </div>
+
+            <div className="grid gap-8">
+              {formulaCategories.map((category, idx) => (
+                <div key={idx} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="bg-gradient-to-l from-gray-50 to-white px-6 py-4 border-b border-gray-100">
+                    <h3 className="text-xl font-bold text-gray-800">{category.title}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{category.description}</p>
+                  </div>
+                  <div className="divide-y divide-gray-100">
+                    {category.items.map((item, itemIdx) => (
+                      <div key={itemIdx} className="p-6 hover:bg-gray-50 transition-colors">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div className="flex-1">
+                            <code className="block text-lg font-bold text-blue-700 bg-blue-50 p-3 rounded-lg mb-2 font-mono" dir="ltr">
+                              {item.eng}
+                            </code>
+                            <div className="flex items-center text-gray-700 font-medium mr-1">
+                              <ArrowRight className="w-4 h-4 ml-2 text-gray-400" />
+                              {item.ar}
+                            </div>
+                          </div>
+                          {item.note && (
+                            <div className="md:w-1/3 text-sm text-gray-500 bg-gray-50 p-3 rounded border border-gray-100 italic">
+                              💡 {item.note}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+      
+      <footer className="bg-gray-800 text-gray-400 py-8 mt-12 text-center">
+        <p>تم إعداد هذا المحتوى التعليمي للمراجعة الجامعية</p>
+        <p className="text-xs mt-2 text-gray-500">تم التصميم بواسطة الطالب عبدالرحمن احمد محمد</p>
+      </footer>
+    </div>
+  );
+};
+
+export default ChemistrySolverApp;
